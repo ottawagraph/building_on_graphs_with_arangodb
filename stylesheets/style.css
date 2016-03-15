@@ -1,0 +1,145 @@
+@import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+@import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+@import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+body {
+  font-family: 'Droid Serif';
+  background-color: #f5f8f0;
+}
+
+.small code {
+  font-size: 0.4em;
+}
+
+.align_left {
+  text-align: left;
+}
+
+.fit_width img {
+  width: 100%;
+}
+
+
+.reference {
+  font-size: 0.7em;
+}
+
+.remark-container {
+  background-color: #AAB98E;
+}
+
+.float_left pre {
+  float: left;
+}
+
+.clear_both pre {
+  clear:both;
+}
+
+h1, h2, h3 {
+  font-family: 'Yanone Kaffeesatz';
+  font-weight: normal;
+}
+
+.remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+
+.black {
+  background-color: #000;
+}
+
+.white { color: #fff;}
+
+code.javascript {
+  text-align: left;
+  padding: 2em 0em;
+}
+
+/* Two-column layout */
+.left-column {
+  color: #777;
+  width: 20%;
+  height: 92%;
+  float: left;
+}
+
+.left-column-skinny {
+  color: #777;
+  width: 10%;
+  height: 92%;
+  float: left;
+}
+
+.right-column-fat {
+  width: 90%;
+  float: right;
+  padding-top: 1em;
+}
+
+.quote {
+  background: #f9f9f9;
+  border-left: 10px solid #ccc;
+  margin: 1.5em 10px;
+  padding: 0.5em 10px;
+  quotes: "\201C""\201D""\2018""\2019";
+}
+
+.quote:before {
+  color: #ccc;
+  content: open-quote;
+  font-size: 4em;
+  line-height: 0.1em;
+  margin-right: 0.25em;
+  vertical-align: -0.4em;
+}
+
+.quote p {
+  display: inline;
+}
+
+.quote {
+  padding:1em;
+  font-style: italic;
+  color: #222;
+}
+
+.footnote {
+  font-size: 0.7em;
+  position: absolute;
+  bottom: 3em;
+}
+
+a, .left-column h2:last-of-type, .left-column h3:last-child {
+  color: #000;
+}
+
+.right-column {
+  width: 75%;
+  float: right;
+  padding-top: 1em;
+}
+
+#1979-2005 {
+  text-transform: uppercase;
+  font-weight: bolder;
+}
+
+ul {
+  list-style-type: none;
+}
+
+.fifty img {
+  width: 50%;
+}
+
+.seventy img {
+  width: 70%;
+}
+
+.small_graph img {
+  width: 40%;
+}
+
+.logo img {
+  width: 60%;
+}
+

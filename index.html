@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Building on Graphs with ArangoDB</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" type="text/css" href="stylesheets/style.css" >
+  </head>
+  <body>
+    <textarea id="source">
+
+class: center, middle
+
+# Building on graphs with
+.logo[![graph](images/arangodb_logo.png)]
+
+* Mike Williamson
+
+
+---
+
+class: center, middle
+# Web application development in a nutshell
+
+---
+
+class: center, middle
+# GET example.com/employees
+```bash
+mysql> SELECT * FROM employee;
++-----+--------+------------+--------+
+| id  | name   | dept       | salary |
++-----+--------+------------+--------+
+| 100 | Thomas | Sales      |   5000 |
+| 200 | Jason  | Technology |   5500 |
+| 300 | Sanjay | Technology |   7000 |
+| 400 | Nisha  | Marketing  |   9500 |
+| 500 | Randy  | Technology |   6000 |
+| 501 | Ritu   | Accounting |   NULL |
++-----+--------+------------+--------+
+6 rows in set (0.01 sec)
+```
+
+---
+
+class: center, middle
+# GET example.com/employee/100
+
+```bash
+mysql> SELECT * FROM employee WHERE id = 100;
++-----+--------+------------+--------+
+| id  | name   | dept       | salary |
++-----+--------+------------+--------+
+| 100 | Thomas | Sales      |   5000 |
++-----+--------+------------+--------+
+1 rows in set (0.01 sec)
+```
+---
+
+class: center, middle
+# PUT example.com/employee/100
+name=Thomas&dept=Sales&salary=5000
+```bash
+mysql> INSERT INTO employees (name, dept, salary) VALUES ("Thomas", "Sales", "5000");
+```
+
+# DELETE example.com/employee/100
+```bash
+mysql> DELETE FROM employees WHERE id = 100;
+```
+---
+
+class: center, middle
+
+# But data is looking less and less tabular
+
+* Combining data from different places (APIs, partners)
+* Modeling the real world (processes/systems/interactions)
+* Variable relationships
+* Variable attributes
+
+---
+
+class: center, middle
+.small_graph[![graph](images/random_graph.png)]
+
+---
+
+
+class: center, middle
+
+# Taking on the hairball with ArangoDB
+
+---
+
+class: center, middle
+# ArangoDB is a document store
+
+```javascript
+{
+  title:  "ArangoDB is awesome.",
+  text: "lorum ipsum...",
+  author: "Mike Williamson",
+  date:   "2016-03-12",
+  comments: [
+    {
+      author:"Mike's Mum",
+      email:"mikes_mum@allthemums.com",
+      text: "That's great honey",
+    },
+    {
+      "author": "spammer@fakeguccihandbags.com",
+      "title": "Brilliant",
+      "text": "Gucci handbags...",
+    }
+  ],
+  tags:["arangodb","nosql"]
+}
+```
+
+---
+
+class: center, middle
+
+.quote["NoSQL tosses away functionality for speed.
+ If you don't need the functionality, you'll be fine,
+ but if you need it in the future, you'll be sorry."
+-- Peter Wayner, Infoworld]
+
+## The functionality most document stores give up is joins
+
+---
+
+class: center, middle
+## ArangoDB is also a graph database
+
+.float_left[```javascript
+{
+  "_id" : "nodes/784597657972",
+  "_key" : "784597657972",
+  "_rev" : "784597657972",
+  "name" : "foo"
+}
+
+{
+  "_id" : "nodes/784599624052",
+  "_key" : "784599624052",
+  "_rev" : "784599624052",
+  "name" : "bar"
+}
+```]
+
+.float_left[```javascript
+{
+  "_id" : "nodes/784605981044",
+  "_key" : "784605981044",
+  "_rev" : "784605981044"
+  "_from": "nodes/784597657972",
+  "_to": "nodes/784599624052"
+}
+```]
+
+
+.clear_both[```javascript
+db._query('RETURN GRAPH_NEIGHBORS("test", {name: "foo"})[*].vertex').toArray()
+[
+  [
+    {
+      "_id" : "nodes/784599624052",
+      "_key" : "784599624052",
+      "_rev" : "784599624052",
+      "name" : "bar"
+    }
+  ]
+]
+```]
+
+---
+
+class: center, middle
+
+## Features vs speed?*
+
+.seventy[![graph](images/performance.png)]
+
+https://www.arangodb.com/nosql-performance-blog-series/
+
+*Standard vendor benchmark caveats apply
+
+---
+
+class: center, middle
+# A better set of tradeoffs for the data we see
+
+* flexibility (document model)
+* Doesn't throw away features you need for the sake of speed:
+  * ACID
+  * joins (graph model)
+  * transactions
+
+
+## Think of it as MongoDB without the eventual regret.
+
+---
+
+class: center, middle
+# Building on graphs
+
+---
+
+class: center, middle
+# Modeling
+
+---
+
+class: center, middle
+## Illustrative extremes
+
+---
+
+class: center, middle
+## Compact
+
+```javascript
+{
+  title:  "Data Modeling",
+  text: "lorum ipsum...",
+  author: "Mike Williamson",
+  date:   "2016-03-12",
+  comments: [
+    {
+      author:"Mike's Mum",
+      email:"mikes_mum@allthemums.com",
+      text: "That's great honey",
+    },
+    {
+      "author": "spammer@fakeguccihandbags.com",
+      "title": "Brilliant",
+      "text": "Gucci handbags...",
+    }
+  ],
+  tags:["arangodb","nosql"]
+}
+```
+
+---
+class: center, middle
+
+## Sparse
+
+.seventy[![sparse](images/sparse.png)]
+
+---
+
+class: center, middle
+# The prime directive
+
+.quote[A main goal in the design of a graph database is the minimization
+of data access operations needed in graph traversals at query time.]
+
+
+.reference[De Virgilio, Roberto, Antonio Maccioni, and Riccardo Torlone.  "Model-driven design of graph databases." Conceptual Modeling. Springer International Publishing, 2014. 172-185.De Virgilio, Roberto, Antonio Maccioni, and Riccardo Torlone. "Model-driven design of graph databases." Conceptual Modeling. Springer International Publishing, 2014. 172-185.]
+
+---
+
+class: center, middle
+## Compact by default
+
+Assume that everything should be an attribute on a vertex.
+
+### Should this be a vertex?
+* Will it be accessed on it's own? (ie: showing comments without the post)
+* Will it be edited on it's own?
+* Does/could the attribute have relationships of it's own? (assuming you care)
+* Would/should this attribute exist without it's parent vertex?
+
+---
+
+class: center, middle
+## Figuring things out
+
+Creating some data in ArangoDB's admin interface helps you think things
+through.
+
+---
+
+class: center, middle
+## Creating graph data
+.seventy[![graph admin](images/graph_admin.png)]
+
+---
+
+class: center, middle
+## Writing queries
+.seventy[![aql editor](images/aql_editor.png)]
+
+---
+
+class: center, middle
+# Tradeoffs
+
+---
+
+class: center, middle
+
+### Some things get easier
+
+* Joiny Queries
+* Complicated/variable relationships
+* Adding attributes to existing data
+* Dealing with new types of data
+
+### Some things are harder
+
+* Inserting data is complex
+* Changing the stucture of the graph requires scripting (no tools yet)
+
+---
+class: center, middle
+
+# **Re**presentational **S**tate **T**ransfer
+## AKA ReST
+
+Changing your data via URLs and HTTP
+
+---
+
+class: center, middle
+.fifty[![graph](images/large_grain_rest.png)]
+
+---
+
+class: center, middle
+# Graphs can be fine grained data
+
+```javascript
+arangosh [test]> db._query(`RETURN DOCUMENT("vertices/2732073893")`).toArray()
+[
+  {
+    "type" : "office",
+    "_id" : "vertices/2732073893",
+    "_rev" : "71386058214",
+    "_key" : "2732073893"
+  }
+]
+```
+
+---
+
+class: center, middle
+
+This hardly seems worth it.
+
+.seventy[![sparse](images/form_mockup_2.png)]
+
+---
+
+class: center, middle
+
+## Some vertices need context
+
+Sometimes you end up pulling a subgraph. Displaying parts is easy.
+
+What should an edit form look like?
+
+---
+
+class: center, middle
+
+This feels like a lot
+
+.seventy[![sparse](images/form_mockup.png)]
+
+Maybe ReST is for medium grain data?
+
+---
+
+class: center, middle
+
+# Queries
+
+Find, traverse
+
+---
+
+class: center, middle
+### GET example.com/employee/100
+
+.align_left[```sql
+FOR vertex IN vertices
+  FILTER vertex.type == "employee" && vertex.id == 100
+  RETURN vertex
+```]
+.small_graph[![graph](images/single_vertex.png)]
+
+---
+
+class: center, middle
+
+### GET example.com/employee/100
+.align_left[```sql
+FOR vertex IN vertices
+  FILTER vertex.type == "employee" && vertex.id == 100
+    LET neighbors = (RETURN GRAPH_NEIGHBORS("business_graph", vertex, {direction: "outbound"}))
+    RETURN {employee: vertex, employee_details: neighbors}
+```]
+.small_graph[![graph](images/neighbors.png)]
+
+---
+
+class: center, middle
+### GET example.com/employee/100
+.align_left[```sql
+FOR vertex IN vertices
+  FILTER vertex.type == "employee" && vertex.id == 100
+    LET neighbors = (RETURN GRAPH_NEIGHBORS("business_graph", vertex, {maxDepth: 3, direction: "outbound"}))
+    RETURN {employee: vertex, employee_details: neighbors}
+```]
+.small_graph[![graph](images/long_traversal.png)]
+
+---
+
+class: center, middle
+## Edge direction
+
+A powerful way to contain your traversals
+
+---
+
+class: center, middle
+### Consistency is what matters
+.seventy[![edge direction](images/edge_direction.png)]
+
+---
+
+class: center, middle
+# Inserting data
+
+---
+
+class: center, middle
+## An edge
+
+```javascript
+// for this to exist the vertices have to be created first
+{
+  "_id" : "vertices/784605981044",
+  "_key" : "784605981044",
+  "_rev" : "784605981044"
+  "_from": "vertices/784597657972",
+  "_to": "vertices/784599624052"
+}
+```
+---
+
+class: center, middle
+## Server
+
+ArangoDB gives you options.
+
+Send a transaction to the server.
+
+```javascript
+
+var action = String(function (args) {
+  var db = require('org/arangodb').db;
+  // Everthing in here is synchronous
+
+  // Insert all the things!
+});
+
+// Send that function to run as a transaction!
+db.transaction({write: ['vertices', 'edges']}, action, [args])
+```
+---
+
+class: center, middle
+## Server
+
+Create a custom endpoint on the server with Foxx
+
+```javascript
+
+//app.js
+var Foxx = require("org/arangodb/foxx");
+var app = new Foxx.Controller(applicationContext),
+        arangodb = require("org/arangodb"), db = arangodb.db;
+
+app.get("/all_the_things", function(req, res) {
+  db._query('INSERT {foo: "bar"} INTO vertices')
+  return res.json({"inserted": "all the things"});
+});
+
+// manifest.json
+{
+  "name": "insert_all_the_things",
+  "version": "0.0.1",
+  "author": "Mike Williamson",
+  "controllers": {
+    "/": "app.js"
+  },
+  "defaultDocument": ""
+}
+
+```
+
+---
+
+class: center, middle
+## Server
+
+
+.align_left[```sh
+mike@longshot:~/projects/foxx☺ foxx-manager --server.database=test install . /insert
+Application insert_all_the_things version 0.0.1 installed successfully at mount point /insert
+options used: {"configuration":{}}
+
+mike@longshot:~/projects/foxx☺ curl localhost:8529/_db/test/insert/all_the_things
+{"inserted":"all the things"}
+```]
+
+---
+
+class: center, middle
+
+# What all this gets you
+
+* Handling complex data without complexity
+* Being able to say "yes" when people ask "Could we also put X in there?"
+* An entire world of network analysis that is now accessible
+
+There is lots to explore...
+
+---
+
+class: center, middle
+
+# Questions?
+
+### Try it:
+
+http://bit.ly/21rMYIt
+
+
+* Github: @sleepycat
+* Twitter: @dexterchief
+* Electronic Mail: mike@korora.ca
+
+
+
+    </textarea>
+    <script src="out/remark.js" type="text/javascript">
+    </script>
+    <script type="text/javascript">
+      var slideshow = remark.create({ratio: "16:9"});
+    </script>
+  </body>
+</html>
