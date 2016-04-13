@@ -19,11 +19,6 @@ class: center, middle
 ---
 
 class: center, middle
-# Web application development in a nutshell
-
----
-
-class: center, middle
 # GET example.com/employees
 ```bash
 mysql> SELECT * FROM employee;
@@ -71,9 +66,11 @@ mysql> DELETE FROM employees WHERE id = 100;
 
 class: center, middle
 
-# But data is looking less and less tabular
+# The data underneath our apps is changing
 
-* Combining data from different places (APIs, partners)
+Data is becoming less tabular
+
+* Combining data from different places (APIs, partners, open data)
 * Modeling the real world (processes/systems/interactions)
 * Variable relationships
 * Variable attributes
@@ -81,6 +78,9 @@ class: center, middle
 ---
 
 class: center, middle
+# The challenge:
+## complex data, without application complexity
+
 .small_graph[![graph](images/random_graph.png)]
 
 ---
@@ -191,7 +191,8 @@ https://www.arangodb.com/nosql-performance-blog-series/
 class: center, middle
 # A better set of tradeoffs for the data we see
 
-* flexibility (document model)
+* attribute flexibility (document model)
+* relationship flexibility (graph model)
 * Doesn't throw away features you need for the sake of speed:
   * ACID
   * joins (graph model)
@@ -269,6 +270,7 @@ Assume that everything should be an attribute on a vertex.
 
 ### Should this be a vertex?
 * Will it be accessed on it's own? (ie: showing comments without the post)
+* Will I be running some graph measurement on it? (like betweenness)
 * Will it be edited on it's own?
 * Does/could the attribute have relationships of it's own? (assuming you care)
 * Would/should this attribute exist without it's parent vertex?
@@ -304,16 +306,42 @@ class: center, middle
 
 ### Some things get easier
 
-* Joiny Queries
+* Joiny queries
 * Complicated/variable relationships
 * Adding attributes to existing data
 * Dealing with new types of data
 
 ### Some things are harder
 
-* Inserting data is complex
-* Changing the stucture of the graph requires scripting (no tools yet)
+* Complexity moved from query time to insertion time
+* Changing the stucture of the graph requires scripting
+* Sometimes strange fit with web dev practices
 
+---
+
+class: center, middle
+
+# Changing the structure of your graph
+
+---
+class: center, middle
+
+# Data is structure, structure is data
+
+Changing structure == refactoring your
+data.
+
+```javascript
+> GraphMigration = require('./dist/main').default
+> gm = new GraphMigration("test")
+//demote a vertex to being attributes on connected vertices
+gm.vertexToAttribute({foo: "bar"}, "mygraph", {direction: "inbound"})
+//or the other way around
+gm.attributeToVertex({foo: "bar"}, "mygraph", {direction: "inbound"})
+
+```
+
+.footnote[https://github.com/sleepycat/graph_migrations]
 ---
 class: center, middle
 
@@ -435,10 +463,15 @@ class: center, middle
 class: center, middle
 # Inserting data
 
+
 ---
 
 class: center, middle
-## An edge
+## Insertion is more complex
+
+* Often split large blobs of data into vertices/edges
+* Need to know what data to save and what to connect it to
+* Order matters
 
 ```javascript
 // for this to exist the vertices have to be created first
@@ -450,14 +483,23 @@ class: center, middle
   "_to": "vertices/784599624052"
 }
 ```
+
+### ArangoDB gives you options...
+
 ---
 
 class: center, middle
-## Server
+## Achievement unlocked: V8 inception!
 
-ArangoDB gives you options.
+.seventy[![v8](images/v8_inception.png)]
 
-Send a transaction to the server.
+---
+
+class: center, middle
+## Sending Javascript to the server
+
+
+Execute a JS function as a transaction
 
 ```javascript
 
@@ -474,7 +516,7 @@ db.transaction({write: ['vertices', 'edges']}, action, [args])
 ---
 
 class: center, middle
-## Server
+## Foxx
 
 Create a custom endpoint on the server with Foxx
 
@@ -506,7 +548,7 @@ app.get("/all_the_things", function(req, res) {
 ---
 
 class: center, middle
-## Server
+## Foxx
 
 
 .align_left[```sh
@@ -524,11 +566,9 @@ class: center, middle
 
 # What all this gets you
 
-* Handling complex data without complexity
+* Complex data != application complexity
 * Being able to say "yes" when people ask "Could we also put X in there?"
 * An entire world of network analysis that is now accessible
-
-There is lots to explore...
 
 ---
 
@@ -536,15 +576,17 @@ class: center, middle
 
 # Questions?
 
-### Try it:
-
-http://bit.ly/21rMYIt
-
-
 * Github: @sleepycat
 * Twitter: @dexterchief
-* Electronic Mail: mike@korora.ca
+* mike@korora.ca
 
+### T-shirts:
+http://bit.ly/arangodb
+
+### Think graphs are cool?
+http://www.meetup.com/Ottawa-Graph/
+
+April 19th: Clustering and Graphs: Together at Last!
 
 
     </textarea>
