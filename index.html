@@ -315,7 +315,6 @@ class: center, middle
 
 * Complexity moved from query time to insertion time
 * Changing the stucture of the graph requires scripting
-* Sometimes strange fit with web dev practices
 
 ---
 
@@ -342,64 +341,6 @@ gm.attributeToVertex({foo: "bar"}, "mygraph", {direction: "inbound"})
 ```
 
 .footnote[https://github.com/sleepycat/graph_migrations]
----
-class: center, middle
-
-# **Re**presentational **S**tate **T**ransfer
-## AKA ReST
-
-Changing your data via URLs and HTTP
-
----
-
-class: center, middle
-.fifty[![graph](images/large_grain_rest.png)]
-
----
-
-class: center, middle
-# Graphs can be fine grained data
-
-```javascript
-arangosh [test]> db._query(`RETURN DOCUMENT("vertices/2732073893")`).toArray()
-[
-  {
-    "type" : "office",
-    "_id" : "vertices/2732073893",
-    "_rev" : "71386058214",
-    "_key" : "2732073893"
-  }
-]
-```
-
----
-
-class: center, middle
-
-This hardly seems worth it.
-
-.seventy[![sparse](images/form_mockup_2.png)]
-
----
-
-class: center, middle
-
-## Some vertices need context
-
-Sometimes you end up pulling a subgraph. Displaying parts is easy.
-
-What should an edit form look like?
-
----
-
-class: center, middle
-
-This feels like a lot
-
-.seventy[![sparse](images/form_mockup.png)]
-
-Maybe ReST is for medium grain data?
-
 ---
 
 class: center, middle
