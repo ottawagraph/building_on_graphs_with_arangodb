@@ -1,7 +1,5 @@
 # Building on graphs with Arangodb
 
-This is a presentation by Mike Williamson for the Ottawa graph meetup.
-
 To view this presentation, download the zip file or run
 
 ```bash
